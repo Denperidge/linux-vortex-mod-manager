@@ -4,16 +4,30 @@ from pathlib import Path
 
 
 """
-set compatibilitytools to Proton-GE. 25 was used in my install
-run Fallout once before runnçng!
-Select Steam store?
- set to Z?
-- set location to C:/Fallout
-- C:\Vortex Mods\{game}
-- restart
+1. Download nexus.py
+2. Download the vortex mod manager installer from https://www.nexusmods.com/site/mods/1?tab=files&file_id=5911
+   Place it in your /home/{username}/Downloads, or in the same directory as nexus.py
+3. Install F:NV
+4. Set compatibilitytools to Proton-GE
+   (Proton-GE-25 was used in my install)
+5. Launch fallout, close it once you reach main menu
+6. run nexus.py, select Install vortex mod manager
+7. After installation, run Vortex mod manager (through the vortex installer or nexus.py)
+8. Log into your nexus mods account and enable F:NV mod management
+9. (Optional) If Nexus Mod Manager doesn't find the game automatically,
+   navigate to the Install path provided by nexus.py
+10. Set the mod staging directory to the suggested directory in nexus.py
+    Optionally, you can create your own folder and navigate to it, as long as it is also on the Z: drive`
+11. Install your mods, and run the game through Steam!
+12. (Optional) If using NVSE, right-click Fallout: New Vegas in Steam,
+    select Properties, General, and set the launch options to $(echo %command% | sed -r "s/proton waitforexitandrun .*/proton waitforexitandrun/") "$STEAM_COMPAT_INSTALL_PATH/nvse_loader.exe"
+    Thanks to sedme0 on Reddit for that solution! https://www.reddit.com/r/linux_gaming/comments/u5wz7p/redirecting_steam_to_launch_a_different/
+
+NOTE: browser does not work natively. Circumvent using chrome exe?
 
 TODO:
 - Replace os.system
+- Create suggested staging dir
 """
 
 
@@ -123,18 +137,28 @@ MODES = {
 }
 
 if __name__ == "__main__":
-    mode = select_mode()
+    #mode = select_mode()  TODO: more modes
+    mode = MODES["fnv-steam"]
 
     prefix = ask_path_if_needed("prefix", mode["default_prefix"])
+    install_location = ask_path_if_needed("game install", mode["default_install"])
+    suggested_staging_dir = Path(Path.home(), 'VortexMods')
 
-    print(f"Found prefix at {prefix}")
-
+    print(f"Prefix path: {prefix}")
+    print(f"Install path (linux notation): {install_location}")
+    print(f"Install path (windows notation): Z:{install_location}")
+    print(r'NVSE Steam launch option: $(echo %command% | sed -r "s/proton waitforexitandrun .*/proton waitforexitandrun/") "$STEAM_COMPAT_INSTALL_PATH/nvse_loader.exe"')
+    print(f"Suggested staging dir (linux notation): {suggested_staging_dir}")
+    print(f"Suggested staging dir (windows notation): 2:{suggested_staging_dir}")
+    
+    print()
     actions = [
         "Install Vortex Mod Manager",
         f"Link install directory to prefix ({mode['symlink_target']})",
         f"Remove prefix ({prefix})",
         "Run Vortex Mod Manager",
-        "Install .net 6"
+        "Install .net 6",
+        "Create suggested staging dir"
     ]
 
     action = select(actions, "Select action")
@@ -143,7 +167,7 @@ if __name__ == "__main__":
     elif action == actions[1]:
         makedirs(Path(prefix, "drive_c/Mods"))
         symlink(
-            ask_path_if_needed("game install", mode["default_install"]),
+            install_location,
             Path(prefix, mode["symlink_target"]))
     elif action == actions[2]:
         remove_prefix(prefix)
@@ -155,3 +179,5 @@ if __name__ == "__main__":
         #https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe
         run_exe_in_prefix("windowsdesktop-runtime-6.0.36-win-x64.exe", prefix, "wine")
         #run_winetricks_in_prefix(prefix, )
+    elif action == actions[5]:
+        makedirs(suggested_staging_dir)
