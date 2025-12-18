@@ -1,33 +1,16 @@
+#!/usr/bin/env python
 from os import path, system, symlink, makedirs
 from shutil import rmtree
 from pathlib import Path
 
 
 """
-1. Download nexus.py
-2. Download the vortex mod manager installer from https://www.nexusmods.com/site/mods/1?tab=files&file_id=5911
-   Place it in your /home/{username}/Downloads, or in the same directory as nexus.py
-3. Install F:NV
-4. Set compatibilitytools to Proton-GE
-   (Proton-GE-25 was used in my install)
-5. Launch fallout, close it once you reach main menu
-6. run nexus.py, select Install vortex mod manager
-7. After installation, run Vortex mod manager (through the vortex installer or nexus.py)
-8. Log into your nexus mods account and enable F:NV mod management
-9. (Optional) If Nexus Mod Manager doesn't find the game automatically,
-   navigate to the Install path provided by nexus.py
-10. Set the mod staging directory to the suggested directory in nexus.py
-    Optionally, you can create your own folder and navigate to it, as long as it is also on the Z: drive`
-11. Install your mods, and run the game through Steam!
-12. (Optional) If using NVSE, right-click Fallout: New Vegas in Steam,
-    select Properties, General, and set the launch options to $(echo %command% | sed -r "s/proton waitforexitandrun .*/proton waitforexitandrun/") "$STEAM_COMPAT_INSTALL_PATH/nvse_loader.exe"
-    Thanks to sedme0 on Reddit for that solution! https://www.reddit.com/r/linux_gaming/comments/u5wz7p/redirecting_steam_to_launch_a_different/
-
-NOTE: browser does not work natively. Circumvent using chrome exe?
-
 TODO:
 - Replace os.system
 - Create suggested staging dir
+- Remember input
+- browser does not work natively. Circumvent using chrome exe?
+
 """
 
 
