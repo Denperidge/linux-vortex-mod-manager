@@ -2,13 +2,76 @@ from os import path, system, symlink
 from shutil import rmtree
 from pathlib import Path
 
-# --- GENERAL TOOLING ---
+
+"""
+run Fallout once before runnçng!
+Select Steam store?
+"""
+
+
+# --- CONSTANTS ---
 DEFAULT_STEAM_COMPATDATA_PATH = Path(Path.home(), ".steam/steam/steamapps/compatdata/")
 DEFAULT_STEAM_APPS_PATH = Path(Path.home(), ".steam/steam/steamapps/common/")
+# --- CONSTANTS: FALLOUT NEW VEGAS ---
+FNV_STEAM_ID = "22380"
+FNV_STEAMAPPS_NAME = "Fallout New Vegas"
 
+# --- GENERAL TOOLING ---
 def run_exe_in_prefix(exe, prefix):
     system(f"WINEPREFIX=\"{prefix}\" wine \"{exe}\"")
 
+def ask_path_if_needed(title, default_path):
+    if default_path.exists():
+        return default_path
+    else:
+        while not default_path.exists():
+            print(f"Could not find {title} at the expected path ({default_path})!")
+            default_path = Path(input(f"Enter the {title} path: "))
+        return default_path
+
+def select(options, input_title, option_title_func=None):
+    i = 0
+    for option in options:
+        i += 1
+        title = option if option_title_func is None else option_title_func(option)
+        print(f"  {i}: {title}")
+    print()
+
+    selection = "none"
+    while selection != "":
+        selection = input(f"{input_title}, or press ENTER to quit [1-{i}]: ")
+        
+        selection = int(selection)
+        if selection >= 1 and selection <= i:
+            break
+        
+    if selection == "":
+        exit(0)
+
+    if type(options) == dict:
+        return options[list(options.keys())[selection-1]]
+    else:
+        return options[selection-1]
+
+def remove_prefix(prefix):
+    options = ["Remove", "Cancel"]
+    option = select(options, f"Press 1 if you're sure you want to remove {prefix}. This is irreversible! Otherwise, press 2 to cancel")
+    
+    if option == options[0]:
+        rmtree(prefix, True)
+        if not Path(prefix).exists():
+            print("Prefix removed! Launch your game again to create a new one")    
+
+
+def select_mode():
+    def option_title_func(mode):
+        return MODES[mode]['title']
+
+    print("Supported games:")
+    return select(MODES, "Select a game to manage nexus mod manager for", option_title_func)
+
+
+# --- VORTEX MOD MANAGER ---
 def vortex_installer_find():
     current_dir = Path(path.dirname(path.realpath(__file__)))  # Based on the clever code at https://stackoverflow.com/a/5137509
     
@@ -35,78 +98,12 @@ def install_vortex_to_prefix(prefix):
     print(vortex_installer)
     run_exe_in_prefix(vortex_installer, prefix)
 
-def remove_prefix(prefix):
-    # Select quits if 1 is not selected
-    options = ["Remove", "Cancel"]
-    option = select(options, f"Press 1 if you're sure you want to remove {prefix}. This is irreversible! Otherwise, press 2 to cancel")
-    
-    if option == options[0]:
-        rmtree(prefix, True)
-        if not Path(prefix).exists():
-            print("Prefix removed! Launch your game again to create a new one")    
-
-# --- FALLOUT NEW VEGAS ---
-
-FNV_STEAM_ID = "22380"
-FNV_STEAMAPPS_NAME = "Fallout New Vegas"
-
-def ask_path_if_needed(title, default_path):
-    if default_path.exists():
-        return default_path
-    else:
-        while not default_path.exists():
-            print(f"Could not find {title} at the expected path ({default_path})!")
-            default_path = Path(input(f"Enter the {title} path: "))
-        return default_path
-
-
-"""
-run Fallout once before runnçng!
-Select Steam store?
-"""
-
-# --- DEFAULT BEHAVIOUR ---
-
-
-"""meow"""
-def select(options, input_title, option_title_func=None):
-    i = 0
-    for option in options:
-        i += 1
-        title = option if option_title_func is None else option_title_func(option)
-        print(f"  {i}: {title}")
-    print()
-
-    selection = "none"
-    while selection != "":
-        selection = input(f"{input_title}, or press ENTER to quit [1-{i}]: ")
-        
-        selection = int(selection)
-        if selection >= 1 and selection <= i:
-            break
-        
-    if selection == "":
-        exit(0)
-
-    if type(options) == dict:
-        return options[list(options.keys())[selection-1]]
-    else:
-        return options[selection-1]
-
-
-
-def select_mode():
-    def option_title_func(mode):
-        return MODES[mode]['title']
-
-    print("Supported games:")
-    return select(MODES, "Select a game to manage nexus mod manager for", option_title_func)
 
 MODES = {
     "fnv-steam": {
         "title": "Fallout: New Vegas (Steam)",
         "default_prefix":  Path(DEFAULT_STEAM_COMPATDATA_PATH, FNV_STEAM_ID, "pfx"),
-        "default_install": Path(DEFAULT_STEAM_APPS_PATH, FNV_STEAMAPPS_NAME+"2"),
+        "default_install": Path(DEFAULT_STEAM_APPS_PATH, FNV_STEAMAPPS_NAME),
         "symlink_target": "drive_c/Fallout New Vegas"
     }
 }
