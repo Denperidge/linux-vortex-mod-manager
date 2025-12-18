@@ -6,14 +6,17 @@ DEFAULT_STEAM_COMPATDATA_PATH = Path(Path.home(), ".steam/steam/steamapps/compat
 
 def vortex_installer_find():
     current_dir = Path(path.dirname(path.realpath(__file__)))  # Based on the clever code at https://stackoverflow.com/a/5137509
-    vortex_installer = list(Path(current_dir).glob("Vortex*.exe"))
+    
+    vortex_installer = []
+    for location in [current_dir, Path(Path.home(), "Downloads"), Path(Path.home(), "downloads")]:
+        vortex_installer += list(location.glob("Vortex*.exe"))
 
     if len(vortex_installer) == 0:
         raise FileNotFoundError(
             "Could not find Vortex mod manager exe!" +
             "\nDue to Nexus Mods limitations, you have to get it yourself. Sorry boss" +
             "\n1. Download it from: https://www.nexusmods.com/site/mods/1?tab=files&file_id=5911" +
-            f"\n2. And put it in the same directory as this script: {current_dir}")
+            f"\n2. And put it in ~/Downloads, ~/downloads, or in the same directory as this script: {current_dir}")
     elif len(vortex_installer) > 1:
         print("Found multiple vortex exe's. Please select one!")
         vortex_installer = select(vortex_installer, "Select your preferred vortex installer")
