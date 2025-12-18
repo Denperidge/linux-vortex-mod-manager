@@ -107,7 +107,7 @@ def vortex_installer_find():
 def install_vortex_to_prefix(prefix):
     vortex_installer = vortex_installer_find()
     print(vortex_installer)
-    run_exe_in_prefix(vortex_installer, prefix)
+    run_exe_in_prefix(vortex_installer, prefix, "wine")
 
 
 MODES = {
@@ -129,10 +129,10 @@ if __name__ == "__main__":
 
     print(f"Prefix path: {prefix}")
     print(f"Install path (linux notation): {install_location}")
-    print(f"Install path (windows notation): Z:{install_location}")
+    print(f"Install path (windows notation): Z:{str(install_location).replace("/", "\\")}")
     print(r'NVSE Steam launch option: $(echo %command% | sed -r "s/proton waitforexitandrun .*/proton waitforexitandrun/") "$STEAM_COMPAT_INSTALL_PATH/nvse_loader.exe"')
     print(f"Suggested staging dir (linux notation): {suggested_staging_dir}")
-    print(f"Suggested staging dir (windows notation): 2:{suggested_staging_dir}")
+    print(f"Suggested staging dir (windows notation): Z:{str(suggested_staging_dir).replace("/", "\\")}")
     
     print()
     actions = [

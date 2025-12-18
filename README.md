@@ -16,7 +16,7 @@ This project is made for Fallout: New Vegas on steam. But with some edits, can w
 ### A) Setup requirements
 1. Download [nexus.py](https://raw.githubusercontent.com/Denperidge/linux-vortex-mod-manager/refs/heads/main/nexus.py) 
 ```bash
-wget https://raw.githubusercontent.com/Denperidge/linux-vortex-mod-manager/refs/heads/main/nexus.py`
+wget https://raw.githubusercontent.com/Denperidge/linux-vortex-mod-manager/refs/heads/main/nexus.py
 ```
 
 2. Download the vortex mod manager installer from https://www.nexusmods.com/site/mods/1?tab=files&file_id=5911
@@ -51,14 +51,14 @@ chmod +x nexus.py
 ./nexus.py
 ```
 
-2. Select Install vortex mod manager
+2. Select Install vortex mod manager. Install it to the default location
 3. After installation, run Vortex mod manager (either through nexus.py or after the vortex installer finishes)
 4. Log into your nexus mods account and enable F:NV mod management
 5. (Optional) If Nexus Mod Manager doesn't find the game automatically,
    navigate to the **Install path** provided by nexus.py
-6. Set the **mod staging directory** to the suggested directory in nexus.py.
+6. You will get a notification that mods cannot be deployed. Click Fix, and set the **mod staging folder** to the suggested directory in nexus.py.
     Optionally, you can create your own folder and navigate to it, as long as it is also on the Z: drive`
-7. Install your mods, and run the game through Steam!
+7. Install mods from file, and run the game through Steam!
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
