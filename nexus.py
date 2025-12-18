@@ -1,11 +1,19 @@
-from os import path, system, symlink
+from os import path, system, symlink, makedirs
 from shutil import rmtree
 from pathlib import Path
 
 
 """
+set compatibilitytools to Proton-GE. 25 was used in my install
 run Fallout once before runnçng!
 Select Steam store?
+ set to Z?
+- set location to C:/Fallout
+- C:\Vortex Mods\{game}
+- restart
+
+TODO:
+- Replace os.system
 """
 
 
@@ -17,8 +25,14 @@ FNV_STEAM_ID = "22380"
 FNV_STEAMAPPS_NAME = "Fallout New Vegas"
 
 # --- GENERAL TOOLING ---
-def run_exe_in_prefix(exe, prefix):
-    system(f"WINEPREFIX=\"{prefix}\" wine \"{exe}\"")
+def run(command):
+    system(command)
+
+def run_protontricks_in_prefix(prefix, args):
+    run(f'protontricks {args}')
+
+def run_exe_in_prefix(exe, prefix, wine="steam-run /home/cat/.steam/steam/compatibilitytools.d/GE-Proton10-25/files/bin/wine"):
+    run(f"WINEPREFIX=\"{prefix}\" STEAM_COMPAT_DATA_PATH=\"{prefix}\" STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.steam/steam {wine} \"{exe}\"")
 
 def ask_path_if_needed(title, default_path):
     if default_path.exists():
@@ -118,16 +132,26 @@ if __name__ == "__main__":
     actions = [
         "Install Vortex Mod Manager",
         f"Link install directory to prefix ({mode['symlink_target']})",
-        f"Remove prefix ({prefix})"
+        f"Remove prefix ({prefix})",
+        "Run Vortex Mod Manager",
+        "Install .net 6"
     ]
 
     action = select(actions, "Select action")
     if action == actions[0]:
         install_vortex_to_prefix(prefix)
     elif action == actions[1]:
+        makedirs(Path(prefix, "drive_c/Mods"))
         symlink(
             ask_path_if_needed("game install", mode["default_install"]),
             Path(prefix, mode["symlink_target"]))
     elif action == actions[2]:
         remove_prefix(prefix)
-
+    elif action == actions[3]:
+        run_exe_in_prefix(
+            Path(prefix, "drive_c/Program Files/Black Tree Gaming Ltd/Vortex/Vortex.exe"),
+            prefix, "wine")
+    elif action == actions[4]:
+        #https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe
+        run_exe_in_prefix("windowsdesktop-runtime-6.0.36-win-x64.exe", prefix, "wine")
+        #run_winetricks_in_prefix(prefix, )
