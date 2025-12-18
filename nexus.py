@@ -1,8 +1,11 @@
-from os import path
+from os import path, system
 from pathlib import Path
 
 # --- GENERAL TOOLING ---
 DEFAULT_STEAM_COMPATDATA_PATH = Path(Path.home(), ".steam/steam/steamapps/compatdata/")
+
+def run_exe_in_prefix(exe, prefix):
+    system(f"WINEPREFIX=\"{prefix}\" wine \"{exe}\"")
 
 def vortex_installer_find():
     current_dir = Path(path.dirname(path.realpath(__file__)))  # Based on the clever code at https://stackoverflow.com/a/5137509
@@ -28,6 +31,7 @@ def vortex_installer_find():
 def install_vortex_to_prefix(prefix):
     vortex_installer = vortex_installer_find()
     print(vortex_installer)
+    run_exe_in_prefix(vortex_installer, prefix)
 
 # --- FALLOUT NEW VEGAS ---
 
@@ -92,6 +96,8 @@ if __name__ == "__main__":
     mode = select_mode()
 
     prefix = mode["find"]()
+
+    print(f"Found prefix at {prefix}")
 
     actions = [
         "Install Vortex Mod Manager",
