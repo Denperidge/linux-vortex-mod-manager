@@ -60,5 +60,6 @@ chmod +x nexus.py
     Optionally, you can create your own folder and navigate to it, as long as it is also on the Z: drive`
 7. Install your mods, and run the game through Steam!
 
-
+## License
+This project is licensed under the [MIT License](LICENSE).
 
