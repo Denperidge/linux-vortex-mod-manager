@@ -1,4 +1,5 @@
 from os import path, system, symlink
+from shutil import rmtree
 from pathlib import Path
 
 # --- GENERAL TOOLING ---
@@ -33,6 +34,16 @@ def install_vortex_to_prefix(prefix):
     vortex_installer = vortex_installer_find()
     print(vortex_installer)
     run_exe_in_prefix(vortex_installer, prefix)
+
+def remove_prefix(prefix):
+    # Select quits if 1 is not selected
+    options = ["Remove", "Cancel"]
+    option = select(options, f"Press 1 if you're sure you want to remove {prefix}. This is irreversible! Otherwise, press 2 to cancel")
+    
+    if option == options[0]:
+        rmtree(prefix, True)
+        if not Path(prefix).exists():
+            print("Prefix removed! Launch your game again to create a new one")    
 
 # --- FALLOUT NEW VEGAS ---
 
@@ -116,7 +127,8 @@ if __name__ == "__main__":
 
     actions = [
         "Install Vortex Mod Manager",
-        "Link install directory to prefix (C:/Fallout New Vegas)"
+        "Link install directory to prefix (C:/Fallout New Vegas)",
+        f"Remove prefix ({prefix})"
     ]
 
     action = select(actions, "Select action")
@@ -124,4 +136,6 @@ if __name__ == "__main__":
         install_vortex_to_prefix(prefix)
     elif action == actions[1]:
         mode["link"](prefix)
+    elif action == actions[2]:
+        remove_prefix(prefix)
 
