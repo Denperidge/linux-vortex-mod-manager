@@ -1,8 +1,9 @@
-from os import path, system
+from os import path, system, symlink
 from pathlib import Path
 
 # --- GENERAL TOOLING ---
 DEFAULT_STEAM_COMPATDATA_PATH = Path(Path.home(), ".steam/steam/steamapps/compatdata/")
+DEFAULT_STEAM_APPS_PATH = Path(Path.home(), ".steam/steam/steamapps/common/")
 
 def run_exe_in_prefix(exe, prefix):
     system(f"WINEPREFIX=\"{prefix}\" wine \"{exe}\"")
@@ -36,6 +37,7 @@ def install_vortex_to_prefix(prefix):
 # --- FALLOUT NEW VEGAS ---
 
 FNV_STEAM_ID = "22380"
+FNV_STEAMAPPS_ID = "Fallout New Vegas"
 def fnv_steam_find():
     default_path = Path(DEFAULT_STEAM_COMPATDATA_PATH, FNV_STEAM_ID, "pfx")
 
@@ -44,6 +46,19 @@ def fnv_steam_find():
 
     return default_path
 
+def fnv_steam_link(prefix):
+    default_path = Path(DEFAULT_STEAM_APPS_PATH, FNV_STEAMAPPS_ID)
+    
+    if not default_path.exists():
+        raise FileNotFoundError("steamapps path")
+
+    symlink(default_path, Path(prefix, "drive_c/Fallout New Vegas"))
+
+
+"""
+run Fallout once before runnçng!
+Select Steam store?
+"""
 
 # --- DEFAULT BEHAVIOUR ---
 
@@ -52,7 +67,7 @@ MODES = {
     "fnv-steam": {
         "title": "Fallout: New Vegas (Steam)",
         "find": fnv_steam_find, 
-        #"install": 
+        "link": fnv_steam_link
     }
 }
 
@@ -101,10 +116,12 @@ if __name__ == "__main__":
 
     actions = [
         "Install Vortex Mod Manager",
+        "Link install directory to prefix (C:/Fallout New Vegas)"
     ]
 
     action = select(actions, "Select action")
     if action == actions[0]:
         install_vortex_to_prefix(prefix)
-
+    elif action == actions[1]:
+        mode["link"](prefix)
 
