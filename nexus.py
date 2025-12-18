@@ -48,22 +48,16 @@ def remove_prefix(prefix):
 # --- FALLOUT NEW VEGAS ---
 
 FNV_STEAM_ID = "22380"
-FNV_STEAMAPPS_ID = "Fallout New Vegas"
-def fnv_steam_find():
-    default_path = Path(DEFAULT_STEAM_COMPATDATA_PATH, FNV_STEAM_ID, "pfx")
+FNV_STEAMAPPS_NAME = "Fallout New Vegas"
 
-    if not default_path.exists():
-        raise NotImplementedError("This script currently expects FNV to be installed in the home folder")
-
-    return default_path
-
-def fnv_steam_link(prefix):
-    default_path = Path(DEFAULT_STEAM_APPS_PATH, FNV_STEAMAPPS_ID)
-    
-    if not default_path.exists():
-        raise FileNotFoundError("steamapps path")
-
-    symlink(default_path, Path(prefix, "drive_c/Fallout New Vegas"))
+def ask_path_if_needed(title, default_path):
+    if default_path.exists():
+        return default_path
+    else:
+        while not default_path.exists():
+            print(f"Could not find {title} at the expected path ({default_path})!")
+            default_path = Path(input(f"Enter the {title} path: "))
+        return default_path
 
 
 """
@@ -72,15 +66,6 @@ Select Steam store?
 """
 
 # --- DEFAULT BEHAVIOUR ---
-
-
-MODES = {
-    "fnv-steam": {
-        "title": "Fallout: New Vegas (Steam)",
-        "find": fnv_steam_find, 
-        "link": fnv_steam_link
-    }
-}
 
 
 """meow"""
@@ -117,17 +102,25 @@ def select_mode():
     print("Supported games:")
     return select(MODES, "Select a game to manage nexus mod manager for", option_title_func)
 
+MODES = {
+    "fnv-steam": {
+        "title": "Fallout: New Vegas (Steam)",
+        "default_prefix":  Path(DEFAULT_STEAM_COMPATDATA_PATH, FNV_STEAM_ID, "pfx"),
+        "default_install": Path(DEFAULT_STEAM_APPS_PATH, FNV_STEAMAPPS_NAME+"2"),
+        "symlink_target": "drive_c/Fallout New Vegas"
+    }
+}
 
 if __name__ == "__main__":
     mode = select_mode()
 
-    prefix = mode["find"]()
+    prefix = ask_path_if_needed("prefix", mode["default_prefix"])
 
     print(f"Found prefix at {prefix}")
 
     actions = [
         "Install Vortex Mod Manager",
-        "Link install directory to prefix (C:/Fallout New Vegas)",
+        f"Link install directory to prefix ({mode['symlink_target']})",
         f"Remove prefix ({prefix})"
     ]
 
@@ -135,7 +128,9 @@ if __name__ == "__main__":
     if action == actions[0]:
         install_vortex_to_prefix(prefix)
     elif action == actions[1]:
-        mode["link"](prefix)
+        symlink(
+            ask_path_if_needed("game install", mode["default_install"]),
+            Path(prefix, mode["symlink_target"]))
     elif action == actions[2]:
         remove_prefix(prefix)
 
