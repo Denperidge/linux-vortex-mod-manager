@@ -1,8 +1,8 @@
 # Linux-Vortex-Mod-Manager
 
-Vortex mod manager is annoying to set up on Linux, but the Linux options scare me. So, let's make Vortex Mod Manager less of a pain to use on Linux!
+Vortex mod manager is annoying to set up on Linux, while the Linux mod managers scare me. So, let's make Vortex Mod Manager less of a pain to use on Linux!
 
-This project is made for Fallout: New Vegas on steam. But with some edits, can work with other games too.
+This project is made for Fallout: New Vegas on Steam. But with some adjustments, it can easily work with other games too.
 
 ## Explanation
 ### Features
