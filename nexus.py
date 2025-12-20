@@ -9,8 +9,8 @@ TODO:
 - Replace os.system
 - Create suggested staging dir
 - Remember input
-- browser does not work natively. Circumvent using chrome exe?
-
+- browser does not work natively. Circumvent using chrome exe? people menntion using xdg-open
+- clear staging follder
 """
 
 
@@ -25,11 +25,11 @@ FNV_STEAMAPPS_NAME = "Fallout New Vegas"
 def run(command):
     system(command)
 
-def run_protontricks_in_prefix(prefix, args):
-    run(f'protontricks {args}')
+def run_protontricks_in_fnv(args):
+    run(f'protontricks {FNV_STEAM_ID} {args}')
 
-def run_exe_in_prefix(exe, prefix, wine="steam-run /home/cat/.steam/steam/compatibilitytools.d/GE-Proton10-25/files/bin/wine"):
-    run(f"WINEPREFIX=\"{prefix}\" STEAM_COMPAT_DATA_PATH=\"{prefix}\" STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.steam/steam {wine} \"{exe}\"")
+def run_exe_in_prefix(exe, prefix, wine="steam-run /home/cat/.steam/steam/compatibilitytools.d/GE-Proton10-25/files/bin/wine", extra=""):
+    run(f"WINEPREFIX=\"{prefix}\" STEAM_COMPAT_DATA_PATH=\"{prefix}\" STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.steam/steam {wine} \"{exe}\" {extra}")
 
 def ask_path_if_needed(title, default_path):
     if default_path.exists():
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         f"Link install directory to prefix ({mode['symlink_target']})",
         f"Remove prefix ({prefix})",
         "Run Vortex Mod Manager",
-        "Install .net 6",
+        "Install .net 48",
         "Create suggested staging dir"
     ]
 
@@ -160,7 +160,10 @@ if __name__ == "__main__":
             prefix, "wine")
     elif action == actions[4]:
         #https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe
-        run_exe_in_prefix("windowsdesktop-runtime-6.0.36-win-x64.exe", prefix, "wine")
+        #? https://download.microsoft.com/download/f/3/a/f3a6af84-da23-40a5-8d1c-49cc10c8e76f/NDP48-x86-x64-AllOS-ENU.exe
+        run_protontricks_in_fnv("dotnet48")
+        #run_exe_in_prefix("dotnet48", prefix, "winetricks")
+        #run_exe_in_prefix("NDP48-x86-x64-AllOS-ENU.exe", prefix, "wine")
         #run_winetricks_in_prefix(prefix, )
     elif action == actions[5]:
         makedirs(suggested_staging_dir)
