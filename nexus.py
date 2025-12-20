@@ -2,7 +2,7 @@
 from os import path, system, symlink, makedirs
 from shutil import rmtree
 from pathlib import Path
-
+from urllib.request import urlretrieve
 
 """
 TODO:
@@ -15,6 +15,8 @@ TODO:
 
 
 # --- CONSTANTS ---
+VORTEX_DOWNLOAD_LINK = "https://github.com/Nexus-Mods/Vortex/releases/download/v1.16.0-beta.3/vortex-setup-1.16.0-beta.3.exe"
+# If you're reading this in the future, get a newer version here: https://github.com/Nexus-Mods/Vortex/releases/
 DEFAULT_STEAM_COMPATDATA_PATH = Path(Path.home(), ".steam/steam/steamapps/compatdata/")
 DEFAULT_STEAM_APPS_PATH = Path(Path.home(), ".steam/steam/steamapps/common/")
 # --- CONSTANTS: FALLOUT NEW VEGAS ---
@@ -88,24 +90,42 @@ def vortex_installer_find():
     
     vortex_installer = []
     for location in [current_dir, Path(Path.home(), "Downloads"), Path(Path.home(), "downloads")]:
-        vortex_installer += list(location.glob("Vortex*.exe"))
+        vortex_installer += list(location.glob("Vortex*.exe")) + list(location.glob("vortex*.exe"))
 
-    if len(vortex_installer) == 0:
-        raise FileNotFoundError(
-            "Could not find Vortex mod manager exe!" +
-            "\nDue to Nexus Mods limitations, you have to get it yourself. Sorry boss" +
-            "\n1. Download it from: https://www.nexusmods.com/site/mods/1?tab=files&file_id=5911" +
-            f"\n2. And put it in ~/Downloads, ~/downloads, or in the same directory as this script: {current_dir}")
+    
+    if len(vortex_installer) == 1:
+        vortex_installer = vortex_installer[0] 
     elif len(vortex_installer) > 1:
         print("Found multiple vortex exe's. Please select one!")
         vortex_installer = select(vortex_installer, "Select your preferred vortex installer")
     else:
-        vortex_installer = vortex_installer[0]
+        print("No vortex installer found! You can either...")
+        print(
+            "- Cancel, manually download a release from https://github.com/Nexus-Mods/Vortex/releases/, " +
+            f"put it in ~/Downloads, ~/downloads, or in the same directory as this script ({current_dir}). " +
+            "Then re-run this command!")
+        print(f"- Automatically download the pre-configured Vortex version in this script")
+        
+        VORTEX_FILENAME = VORTEX_DOWNLOAD_LINK[VORTEX_DOWNLOAD_LINK.rfind("/")+1:]
+        options = [
+            f"Download the pre-configured version ({VORTEX_FILENAME})",
+            "Cancel"]
+        selection = select(options, "Selection")
+        if selection == options[0]:
+            print(f"Downloading {VORTEX_FILENAME}...")
+            returned_path = urlretrieve(VORTEX_DOWNLOAD_LINK, VORTEX_FILENAME)[0]
+            vortex_installer = returned_path
+            print("Done!")
+        else:
+            return None
+
     return vortex_installer    
 
 
 def install_vortex_to_prefix(prefix):
     vortex_installer = vortex_installer_find()
+    if vortex_installer == None:
+        return False
     print(vortex_installer)
     run_exe_in_prefix(vortex_installer, prefix, "wine")
 
